@@ -55,5 +55,99 @@ def fixed_xor(string1, string2):
         return binascii.hexlify(xor_result)
 
 
+def single_byte_xor_cipher(string, key):
+    """Sigle byte XOR cipher
+    This function take a string and XOR'd against a single character.
+
+    Parameters
+    ----------
+    string : str
+        hex string to be xor
+    key : int
+        key used to XOR'd
+
+    Return
+    ------
+    xor_result
+        Return XOR'd string
+
+    """
+    xor_result = b''
+    unhexlify_string = binascii.unhexlify(string)
+    for byte in unhexlify_string:
+        xor_result += bytes([byte ^ key])
+
+    return xor_result
+
+
+def english_frequency_score(input_bytes):
+    """Compare each input byte to a character frequency
+    This function returns the score of a message based on the relative
+    frequency; the characters that occurs in the English language
+
+    Parameters
+    ----------
+    input_bytes : bytes
+        Input bytes to be compared with character frequency
+
+    Returns
+    -------
+    score
+        Return score of the input bytes
+
+    """
+    char_frequencies = {
+        'a': .08167, 'b': .01492, 'c': .02782, 'd': .04253,
+        'm': .02406, 'n': .06749, 'o': .07507, 'p': .01929,
+        'q': .00095, 'r': .05987, 's': .06327, 't': .09056,
+        'u': .02758, 'v': .00978, 'w': .02360, 'x': .00150,
+        'y': .01974, 'z': .00074, ' ': .13000
+    }
+
+    scores = sum([char_frequencies.get(chr(byte), 0) for byte in input_bytes
+                  .lower()])
+
+    return scores
+
+
+def brute_single_byte_xor_cipher(string):
+    """Break single byte XOR cipher
+    This function break single byte XOR cipher by brute-focing the key using
+    frequency analysis.
+
+    Parameters
+    ----------
+    string : str
+        The cipher text
+
+    Returns
+    -------
+    key
+        Return the key used to create the cipher text
+    message
+        Return decrypted message
+
+    """
+    potential_msg = [] # list of potential messages
+    for key in range(1, 256):
+        msg = single_byte_xor_cipher(string, key)
+        score = english_frequency_score(msg)
+        xor_result = {
+            'plaintext': msg,
+            'score': score,
+            'key': key
+        }
+        potential_msg.append(xor_result)
+
+    # get best score by
+    # sorting the list of potential messages
+    best_score = sorted(potential_msg, key=lambda k: k['score'], reverse=True)\
+        [0]
+    key = chr(best_score.get('key')) # Character used for XOR'd
+    message = best_score.get('plaintext').decode("ascii") # decrypted message
+
+    return message, key
+
+
 if __name__ == '__main__':
     pass
