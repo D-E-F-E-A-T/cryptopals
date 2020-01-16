@@ -144,9 +144,55 @@ def brute_single_byte_xor_cipher(string):
     best_score = sorted(potential_msg, key=lambda k: k['score'], reverse=True)\
         [0]
     key = chr(best_score.get('key')) # Character used for XOR'd
-    message = best_score.get('plaintext').decode("ascii") # decrypted message
+    score = best_score.get('score')
+    message = best_score.get('plaintext') # decrypted message
 
-    return message, key
+    return [message, key, score]
+
+
+def detect_single_char_xor(input_file):
+    """Detect single character XOR
+    This function detect a single character XOR cipher in a file
+
+    Parameters
+    ----------
+    input_file : bytes
+        File with encrypted strings
+
+    Returns
+    --------
+    message
+        Return decrypted message
+    key
+        Return key used to encrypt the message
+    cipher
+        Return the single-character XOR cipher from the file
+
+    """
+    # open the file with encrypted strings
+    # input_file e.g 4.txt
+    with open(input_file) as lines:
+        ciphers = lines.read().splitlines() # store ciphers
+
+    potential_msg = []
+    for cipher in ciphers:
+        # store results in a dic
+        cipher_result = {
+            'message': brute_single_byte_xor_cipher(cipher)[0],
+            'key': brute_single_byte_xor_cipher(cipher)[1],
+            'score': brute_single_byte_xor_cipher(cipher)[2],
+            'cipher': cipher
+        }
+        potential_msg.append(cipher_result)
+
+    # get the best score from potential_msg
+    best_score = sorted(potential_msg, key=lambda x: x['score'], reverse=True)\
+        [0]
+    message = best_score.get('message')
+    key = best_score.get('key')
+    cipher = best_score.get('cipher')
+
+    return [message, key, cipher]
 
 
 if __name__ == '__main__':
