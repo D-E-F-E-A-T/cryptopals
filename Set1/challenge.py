@@ -195,5 +195,77 @@ def detect_single_char_xor(input_file):
     return [message, key, cipher]
 
 
+def repeating_key_xor(input_file, key):
+    """Repeating key XOR
+    This function encrypt a file contents using a repeating-key XOR by
+    sequentially applying the byte of the key
+
+    Parameters
+    ----------
+    input_file : bytes
+        bytes to be XOR'd
+    key : str
+        XOR key
+
+    Returns
+    -------
+    cipher
+        Return the XOR'd cipher
+
+    """
+    # read the file with contents
+    # to be encrypted
+    with open(input_file) as lines:
+        data = lines.read().rstrip('\n')
+    # initialized variables
+    cipher = b'' # encrypted message
+    index = 0 # key index
+    data = bytes(data, 'utf-8') # convert str to bytes
+    key = bytes(key, 'utf-8') # convert str to bytes
+    for byte in data:
+        cipher += bytes([byte ^ key[index]])
+        # reset the key index
+        if (index + 1) == len(key):
+            index = 0
+        else:
+            index += 1
+    cipher = binascii.hexlify(cipher)
+
+    return cipher
+
+
+def decrypt_repeating_key_xor(cipher_msg, key):
+    """Decrypt repeating key XOR
+    This function decrypt a cipher encrypted using a repeating XOR key
+
+    NOTE: This function is not part of the cryptopals crypto challenges.
+
+    Parameters
+    ----------
+    cipher_msg : str
+        cipher message to be decrypted
+    key : str
+        key used to encrypt the message
+
+    Returns
+    -------
+    plaintext
+        Return the plaintext message
+
+    """
+    key = bytes(key, 'utf-8')
+    index = 0 # key index
+    plaintext = b''
+    for byte in binascii.unhexlify(cipher_msg):
+        plaintext += bytes([byte ^ key[index]])
+        if (index + 1) == len(key):
+            index = 0
+        else:
+            index += 1
+    plaintext = plaintext.decode('ascii')
+
+    return plaintext
+
+
 if __name__ == '__main__':
     pass
