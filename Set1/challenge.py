@@ -267,5 +267,37 @@ def decrypt_repeating_key_xor(cipher_msg, key):
     return plaintext
 
 
+def hamming_distance(str1, str2):
+    """ Compute hamming distance
+    This function compute the hamming distance between two strings. The
+    hamming distance is the number of bit position in which the two bits
+    are different.
+
+    Parameters
+    ----------
+    str1 : str
+        1st string
+    str2 : str
+        2nd string
+
+    Returns
+    -------
+    hamming_distance
+        Return hamming distance
+    """
+    if len(str1) != len(str2):
+        exit(1)
+    else:
+        # convert strings to binary
+        binary_str1 = bin(int(binascii.hexlify(bytes(str1, 'utf-8')), 16))[2:]
+        binary_str2 = bin(int(binascii.hexlify(bytes(str2, 'utf-8')), 16))[2:]
+        # calculate hamming distance
+        # total number of 1s gives the hamming distance
+        hamming_distance = bin(int(binary_str1, 2) ^ int(binary_str2, 2))[2:]\
+                .count('1')
+
+    return hamming_distance
+
+
 if __name__ == '__main__':
     pass
